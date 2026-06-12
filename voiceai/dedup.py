@@ -1,5 +1,14 @@
 """Word-level deduplication for overlap-buffered chunked transcription."""
 
+import re
+
+_PUNCT = re.compile(r"[^\w]")
+
+
+def _norm(word: str) -> str:
+    """Lowercase and strip punctuation for comparison."""
+    return _PUNCT.sub("", word).lower()
+
 
 def strip_overlap(prev_text: str, new_text: str) -> str:
     """
@@ -34,18 +43,18 @@ def strip_overlap(prev_text: str, new_text: str) -> str:
     if not prev_text or not new_text:
         return new_text
 
-    prev_words = prev_text.lower().split()
-    new_lower = new_text.lower().split()
+    prev_words = [_norm(w) for w in prev_text.split()]
+    new_norm = [_norm(w) for w in new_text.split()]
     new_orig = new_text.split()
 
-    if not prev_words or not new_lower:
+    if not prev_words or not new_norm:
         return new_text
 
     best = 0
-    limit = min(len(prev_words), len(new_lower), 12)
+    limit = min(len(prev_words), len(new_norm), 12)
 
     for length in range(1, limit + 1):
-        if prev_words[-length:] == new_lower[:length]:
+        if prev_words[-length:] == new_norm[:length]:
             best = length
 
     if best > 0:

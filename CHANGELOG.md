@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 - User-editable hotwords file (`~/.config/voiceai/hotwords.txt`) — biases the Whisper decoder toward recognising specific words (brand names, proper nouns, domain terms); re-read on every transcription, no restart needed; created automatically on first run with `VoiceAI` pre-populated
-- User-editable corrections file (`~/.config/voiceai/corrections.txt`) — deterministic post-transcription find-and-replace for known mis-transcriptions; format is `wrong phrase = correct phrase`, case-insensitive match, longest phrase wins; re-read on every transcription, no restart needed; created automatically on first run with common patterns pre-populated (e.g. `PingDink = pingd.in`, `do think = duthink`)
+- User-editable corrections file (`~/.config/voiceai/corrections.txt`) — deterministic post-transcription find-and-replace for known mis-transcriptions; format is `wrong phrase = correct phrase`, case-insensitive match, longest phrase wins; re-read on every transcription, no restart needed; created automatically on first run with common patterns pre-populated (e.g. `PingDink = pingd.in`, `Ping Ding = pingd.in`, `pinged in = pingd.in`, `Dutink = duthink`, `do think = duthink`)
 
 ### Fixed
 
@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Overlap-boundary duplicate text: `condition_on_previous_text=False` also prevents the model from re-generating overlap content based on prior output
 - VAD tuned for dictation: added `min_speech_duration_ms=150` to ignore noise bursts, increased `speech_pad_ms` to 400 ms to prevent early word cut-off
 - Startup now prints paths to both config files so they are always easy to locate
+- Repeated words at chunk boundaries caused by punctuation mismatch: dedup now strips punctuation before word comparison so "clients." and "clients" are treated as the same word
 
 ## [0.1.0] - 2026-03-07
 
