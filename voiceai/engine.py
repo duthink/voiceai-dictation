@@ -5,7 +5,17 @@ import time
 import numpy as np
 
 from voiceai.config import SAMPLE_RATE, BEAM_SIZE, MODEL_NAME, COMPUTE_TYPE
+from voiceai.hotwords import load_hotwords
 from voiceai.log import info, ok
+
+# Whisper hallucinates these phrases on silence / near-silence.
+# Match after lower-casing and stripping trailing punctuation/whitespace.
+_HALLUCINATIONS = frozenset({
+    "", "hmm", "hm", "mm", "mm-hmm", "mhm", "uh", "um", "ah", "oh",
+    "just so", "so", "you", "yeah", "yes", "no",
+    "thank you", "thanks", "thank you for watching",
+    "subtitles", "subtitles by", "bye",
+})
 
 
 class WhisperEngine:
@@ -55,17 +65,28 @@ class WhisperEngine:
 
         audio_f32 = audio_np.astype(np.float32) / 32768.0
 
+        hotwords = load_hotwords()
         kwargs: dict = dict(
             beam_size=self.beam_size,
             language=language,
+            condition_on_previous_text=False,
+            no_speech_threshold=0.6,
+            **({"hotwords": hotwords} if hotwords else {}),
         )
         if self.use_vad:
             kwargs["vad_filter"] = True
             kwargs["vad_parameters"] = dict(
-                min_silence_duration_ms=500,
-                speech_pad_ms=200,
+                threshold=0.5,
+                min_speech_duration_ms=150,
+                min_silence_duration_ms=300,
+                speech_pad_ms=400,
             )
 
         segments, _ = self.model.transcribe(audio_f32, **kwargs)
         text = " ".join(seg.text.strip() for seg in segments)
-        return text.strip()
+        text = text.strip()
+
+        normalized = text.lower().rstrip(".,!?…").strip()
+        if normalized in _HALLUCINATIONS:
+            return ""
+        return text
