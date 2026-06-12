@@ -9,6 +9,7 @@ from voiceai.config import parse_args, OVERLAP_SECONDS
 from voiceai.controller import DictationController
 from voiceai.engine import WhisperEngine
 from voiceai.hotkey import start_listener
+from voiceai.corrections import ensure_corrections_file
 from voiceai.hotwords import ensure_hotwords_file
 from voiceai.log import info, ok
 
@@ -44,9 +45,11 @@ def main(argv=None) -> None:
     listener = start_listener(args.key, controller.toggle)
 
     hotwords_file = ensure_hotwords_file()
+    corrections_file = ensure_corrections_file()
     ok(f"Ready! Press [{args.key.upper()}] to toggle dictation")
     info(f"Chunk: {args.chunk}s | Overlap: {args.overlap}s | Model: {args.model} | Lang: {args.lang}")
-    info(f"Hotwords: {hotwords_file}  (edit to add custom words — no restart needed)")
+    info(f"Hotwords:    {hotwords_file}")
+    info(f"Corrections: {corrections_file}  (wrong = correct, no restart needed)")
     info("Focus any text box, press the key, and start speaking.")
     info("Press Ctrl+C to quit.\n")
 

@@ -5,6 +5,7 @@ import time
 import numpy as np
 
 from voiceai.config import SAMPLE_RATE, BEAM_SIZE, MODEL_NAME, COMPUTE_TYPE
+from voiceai.corrections import apply_corrections
 from voiceai.hotwords import load_hotwords
 from voiceai.log import info, ok
 
@@ -85,6 +86,7 @@ class WhisperEngine:
         segments, _ = self.model.transcribe(audio_f32, **kwargs)
         text = " ".join(seg.text.strip() for seg in segments)
         text = text.strip()
+        text = apply_corrections(text)
 
         normalized = text.lower().rstrip(".,!?…").strip()
         if normalized in _HALLUCINATIONS:
