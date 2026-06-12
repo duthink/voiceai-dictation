@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - VAD tuned for dictation: added `min_speech_duration_ms=150` to ignore noise bursts, increased `speech_pad_ms` to 400 ms to prevent early word cut-off
 - Startup now prints paths to both config files so they are always easy to locate
 - Repeated words at chunk boundaries caused by punctuation mismatch: dedup now strips punctuation before word comparison so "clients." and "clients" are treated as the same word
+- Reduced default chunk interval from 4s to 3s for faster text appearance while keeping overlap at 0.8s
 
 ## [0.1.0] - 2026-03-07
 
