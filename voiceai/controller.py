@@ -111,7 +111,7 @@ class DictationController:
                 clean = strip_overlap(self._prev_text, full_text)
                 self._prev_text = full_text
                 if clean:
-                    self.injector.type_text(" " + clean)
+                    self.injector.type_text(" " + clean.rstrip(".,;:"))
                     snd(f"[chunk] ({elapsed:.1f}s): {clean}")
             else:
                 self._prev_text = ""

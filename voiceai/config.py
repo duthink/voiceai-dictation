@@ -4,7 +4,6 @@ import argparse
 
 # ─── Defaults ───────────────────────────────────────────────────────────────
 
-DEFAULT_KEY = "f9"
 SAMPLE_RATE = 16000
 CHANNELS = 1
 DTYPE = "int16"
@@ -22,10 +21,6 @@ def parse_args(argv=None):
         prog="voiceai",
         description="Local, privacy-first voice-to-text dictation for Linux.",
         epilog="Project: https://github.com/duthink/voiceai-dictation",
-    )
-    parser.add_argument(
-        "--key", default=DEFAULT_KEY, metavar="KEY",
-        help=f"Toggle key: f1-f12, scroll_lock, pause (default: {DEFAULT_KEY})",
     )
     parser.add_argument(
         "--chunk", type=float, default=CHUNK_SECONDS, metavar="SEC",
@@ -61,6 +56,6 @@ def parse_args(argv=None):
         help="Inference device (default: cuda)",
     )
     parser.add_argument(
-        "--version", action="version", version=f"%(prog)s 0.1.0",
+        "--version", action="version", version="%(prog)s 0.1.0",
     )
     return parser.parse_args(argv)

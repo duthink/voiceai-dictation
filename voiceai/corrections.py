@@ -5,6 +5,8 @@ from pathlib import Path
 
 CORRECTIONS_FILE = Path.home() / ".config" / "voiceai" / "corrections.txt"
 
+_cache: list = [None, []]  # [mtime, compiled pairs]
+
 _TEMPLATE = """\
 # VoiceAI corrections — deterministic find-and-replace applied after transcription.
 #
@@ -52,6 +54,10 @@ def load_corrections() -> list[tuple[re.Pattern, str]]:
     if not CORRECTIONS_FILE.exists():
         return []
 
+    mtime = CORRECTIONS_FILE.stat().st_mtime
+    if _cache[0] == mtime:
+        return _cache[1]
+
     pairs: list[tuple[str, str]] = []
     for line in CORRECTIONS_FILE.read_text(encoding="utf-8").splitlines():
         stripped = line.strip()
@@ -68,10 +74,12 @@ def load_corrections() -> list[tuple[re.Pattern, str]]:
     # Longest wrong-phrase first — prevents short patterns eating multi-word matches
     pairs.sort(key=lambda p: len(p[0]), reverse=True)
 
-    return [
+    compiled = [
         (re.compile(r"(?<!\w)" + re.escape(wrong) + r"(?!\w)", re.IGNORECASE), correct)
         for wrong, correct in pairs
     ]
+    _cache[:] = [mtime, compiled]
+    return compiled
 
 
 def apply_corrections(text: str) -> str:

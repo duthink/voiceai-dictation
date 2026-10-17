@@ -32,7 +32,6 @@ def main() -> None:
         import sounddevice as sd  # noqa: F401
         import numpy as np  # noqa: F401
         from faster_whisper import WhisperModel  # noqa: F401
-        from pynput import keyboard  # noqa: F401
         all_ok &= check("Python packages", True)
     except ImportError as exc:
         all_ok &= check("Python packages", False, str(exc))

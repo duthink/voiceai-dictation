@@ -5,10 +5,10 @@ import sys
 import time
 
 from voiceai import __version__
-from voiceai.config import parse_args, OVERLAP_SECONDS
+from voiceai.config import parse_args
 from voiceai.controller import DictationController
 from voiceai.engine import WhisperEngine
-from voiceai.hotkey import start_listener
+from voiceai.control import start_control_server
 from voiceai.corrections import ensure_corrections_file
 from voiceai.hotwords import ensure_hotwords_file
 from voiceai.log import info, ok
@@ -42,15 +42,15 @@ def main(argv=None) -> None:
         overlap_seconds=args.overlap,
         language=args.lang,
     )
-    listener = start_listener(args.key, controller.toggle)
+    start_control_server(controller.toggle)
 
     hotwords_file = ensure_hotwords_file()
     corrections_file = ensure_corrections_file()
-    ok(f"Ready! Press [{args.key.upper()}] to toggle dictation")
+    ok("Ready! Use your toggle shortcut (voice_dict_toggle.sh) to start/stop dictation")
     info(f"Chunk: {args.chunk}s | Overlap: {args.overlap}s | Model: {args.model} | Lang: {args.lang}")
     info(f"Hotwords:    {hotwords_file}")
     info(f"Corrections: {corrections_file}  (wrong = correct, no restart needed)")
-    info("Focus any text box, press the key, and start speaking.")
+    info("Focus any text box, trigger the shortcut, and start speaking.")
     info("Press Ctrl+C to quit.\n")
 
     def shutdown(sig=None, frame=None):
@@ -58,7 +58,6 @@ def main(argv=None) -> None:
         info("Shutting down...")
         if controller.active:
             controller._stop()
-        listener.stop()
         sys.exit(0)
 
     signal.signal(signal.SIGINT, shutdown)

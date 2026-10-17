@@ -71,6 +71,7 @@ class WhisperEngine:
             beam_size=self.beam_size,
             language=language,
             condition_on_previous_text=False,
+            temperature=0.0,  # no sampling fallback: it invents words on unclear audio
             no_speech_threshold=0.6,
             **({"hotwords": hotwords} if hotwords else {}),
         )

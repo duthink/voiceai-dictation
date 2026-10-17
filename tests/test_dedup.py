@@ -41,3 +41,12 @@ class TestStripOverlap:
         prev = "the quick brown"
         new = "The Quick Brown Fox Jumped"
         assert strip_overlap(prev, new) == "Fox Jumped"
+
+    def test_fuzzy_word_match(self):
+        assert strip_overlap("we are testing the system", "the systems works well") == "works well"
+
+    def test_short_words_not_fuzzy(self):
+        assert strip_overlap("it is a cat", "it was a dog") == "it was a dog"
+
+    def test_misheard_first_word_before_overlap(self):
+        assert strip_overlap("the extra here was added", "huge was added and more") == "and more"
